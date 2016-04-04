@@ -62,27 +62,35 @@ Money = Space.domain.ValueObject.extend('Money', {
 
   isEqual(other) {
     this._validateCompatibility(other);
-    return this.amount === other.amount;
+    return new BigNumber(this.amount).isEqual(other.amount);
   },
 
   isGreaterThan(other) {
     this._validateCompatibility(other);
-    return this.amount > other.amount;
+    return new BigNumber(this.amount).isGreaterThan(
+      new BigNumber(other.amount)
+    );
   },
 
   isGreaterThanOrEqualTo(other) {
     this._validateCompatibility(other);
-    return this.amount >= other.amount;
+    return new BigNumber(this.amount).isGreaterThanOrEqualTo(
+      new BigNumber(other.amount)
+    );
   },
 
   isLessThan(other) {
     this._validateCompatibility(other);
-    return this.amount < other.amount;
+    return new BigNumber(this.amount).isLessThan(
+      new BigNumber(other.amount)
+    );
   },
 
   isLessThanOrEqualTo(other) {
     this._validateCompatibility(other);
-    return this.amount <= other.amount;
+    return new BigNumber(this.amount).isLessThanOrEqualTo(
+      new BigNumber(other.amount)
+    );
   },
 
   add(other) {

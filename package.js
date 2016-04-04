@@ -14,7 +14,8 @@ Package.onUse(function(api) {
   api.use([
     'check',
     'ecmascript',
-    'space:domain@0.2.1'
+    'space:domain@0.2.1',
+    'radiant:vo-math@0.1.0'
   ]);
 
   api.add_files([

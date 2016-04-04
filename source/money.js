@@ -50,6 +50,89 @@ Money = Space.domain.ValueObject.extend('Money', {
     };
   },
 
+  convert(rate, currency) {
+    check(rate, Number);
+    check(currency, Currency);
+    if (this.isIn(currency)) {
+      throw new Error(Money.ERRORS.sameCurrencyConversion(this.currency));
+    }
+    let result = new BigNumber(this.amount).multiply(rate).toNumber();
+    return new Money({amount: result, currency: new Currency(currency)});
+  },
+
+  isEqual(other) {
+    this._validateCompatibility(other);
+    return this.amount === other.amount;
+  },
+
+  isGreaterThan(other) {
+    this._validateCompatibility(other);
+    return this.amount > other.amount;
+  },
+
+  isGreaterThanOrEqualTo(other) {
+    this._validateCompatibility(other);
+    return this.amount >= other.amount;
+  },
+
+  isLessThan(other) {
+    this._validateCompatibility(other);
+    return this.amount < other.amount;
+  },
+
+  isLessThanOrEqualTo(other) {
+    this._validateCompatibility(other);
+    return this.amount <= other.amount;
+  },
+
+  add(other) {
+    this._validateCompatibility(other);
+    let result = new BigNumber(this.amount).add(other.amount).toNumber();
+    return new Money({amount: result, currency: this.currency});
+  },
+
+  subtract(other) {
+    this._validateCompatibility(other);
+    let result = new BigNumber(this.amount).subtract(other.amount).toNumber();
+    return new Money({amount: result, currency: this.currency});
+  },
+
+  multiply(other) {
+    this._validateCompatibility(other);
+    let result = new BigNumber(this.amount).multiply(other.amount).toNumber();
+    return new Money({amount: result, currency: this.currency});
+  },
+
+  divide(other) {
+    this._validateCompatibility(other);
+    let result = new BigNumber(this.amount).divide(other.amount).toNumber();
+    return new Money({amount: result, currency: this.currency});
+  },
+
+  percentage(percentage) {
+    let result = new BigNumber(this.amount).percentage(percentage).toNumber();
+    return new Money({amount: result, currency: this.currency});
+  },
+
+  delta(other) {
+    this._validateCompatibility(other);
+    return new BigNumber(this.amount).subtract(other.amount).toNumber();
+  },
+
+  isIn(currency) {
+    check(currency, Currency);
+    return this.currency.equals(currency);
+  },
+
+  _validateCompatibility(other) {
+    if (!other.currency || !this.isIn(other.currency)) {
+      throw new Error(Money.ERRORS.currencyMissmatch(
+        this.currency, other.currency
+      ));
+    }
+    return true;
+  },
+
   /**
    * Returns the number of decimal places of given number.
    * http://stackoverflow.com/questions/9539513/is-there-a-reliable-way-in-javascript-to-obtain-the-number-of-decimal-places-of
@@ -70,3 +153,25 @@ Money = Space.domain.ValueObject.extend('Money', {
 });
 
 Money.DEFAULT_CURRENCY = 'EUR';
+
+
+Money.ERRORS = {
+  sameCurrencyConversion(currency) {
+    return `Converting to same currency '${currency.toString()}' is not allowed`;
+  },
+  currencyMissmatch(requiredCurrency, passedCurrency) {
+    return `Currency passed '${passedCurrency.toString()}' does not match required
+    '${requiredCurrency.toString()}'`;
+  }
+};
+
+Money.prototype.eq = Money.prototype.isEqual;
+Money.prototype.gt = Money.prototype.greaterThan = Money.prototype.isGreaterThan;
+Money.prototype.gte = Money.prototype.greaterThanOrEqualTo = Money.prototype.isGreaterThanOrEqualTo;
+Money.prototype.lt = Money.prototype.lessThan = Money.prototype.isLessThan;
+Money.prototype.lte = Money.prototype.lessThanOrEqualTo = Money.prototype.isLessThanOrEqualTo;
+Money.prototype.plus = Money.prototype.add;
+Money.prototype.sub = Money.prototype.minus = Money.prototype.subtract;
+Money.prototype.div = Money.prototype.dividedBy = Money.prototype.divide;
+Money.prototype.mul = Money.prototype.times = Money.prototype.multiply;
+Money.prototype.percent = Money.prototype.percentOf = Money.prototype.percentage
